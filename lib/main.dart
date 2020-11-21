@@ -28,17 +28,6 @@ class _ListMeusCarrosState extends State<ListMeusCarros> {
   List<Map<String, dynamic>> data = <Map<String, dynamic>>[];
 
   @override
-  void initState() {
-    super.initState();
-    FirebaseFirestore.instance
-        .collection('meus_carros')
-        .get()
-        .then((value) => setState(() {
-              value.docs.map((e) => print(e.data())).toList();
-            }));
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CARROS',
@@ -46,16 +35,33 @@ class _ListMeusCarrosState extends State<ListMeusCarros> {
         appBar: AppBar(
           title: Text('MEUS CARROS'),
         ),
-        body: ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            var carro = data[index];
-            return Padding(
-              padding: const EdgeInsets.all(15),
-              child: Text(
-                  "Meu carro$index: ${carro['anoFabricacao']} ${carro['anoModelo']} ${carro['modelo']} ${carro['marca']} ${carro['placa']} "),
-            );
+        body: RefreshIndicator(
+          onRefresh: () async {
+            var result1 = await meusCarros.doc('1').get();
+            print(result1.data());
+            var result = await meusCarros.get();
+            var idCarros = result.docs.map((e) => e.id).toList();
+            print(idCarros);
+            var carros = <Map<String, dynamic>>[];
+            for (var id in idCarros) {
+              var r = await meusCarros.doc(id).get();
+              carros.add(r.data());
+            }
+            setState(() {
+              data = carros ?? <Map<String, dynamic>>[];
+            });
           },
+          child: ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              var carro = data[index];
+              return Padding(
+                padding: const EdgeInsets.all(15),
+                child: Text(
+                    """Meu carro$index: ${carro['anoFabricacao']} ${carro['anoModelo']} ${carro['modelo']} ${carro['marca']} ${carro['placa']}"""),
+              );
+            },
+          ),
         ),
       ),
     );
