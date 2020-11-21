@@ -37,14 +37,14 @@ class _ListMeusCarrosState extends State<ListMeusCarros> {
         ),
         body: RefreshIndicator(
           onRefresh: () async {
-            var result1 = await meusCarros.doc('1').get();
-            print(result1.data());
-            var result = await meusCarros.get();
-            var idCarros = result.docs.map((e) => e.id).toList();
+            //var result1 = await meusCarros.doc('1').get();
+            //print(result1.data());
+            // var result = await meusCarros.get();
+            var idCarros = [1, 2, 3, 4, 5, 6];
             print(idCarros);
             var carros = <Map<String, dynamic>>[];
             for (var id in idCarros) {
-              var r = await meusCarros.doc(id).get();
+              var r = await meusCarros.doc(id.toString()).get();
               carros.add(r.data());
             }
             setState(() {
